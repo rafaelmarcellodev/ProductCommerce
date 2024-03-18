@@ -92,13 +92,20 @@ namespace ProductAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<ReadProductDto>> GetProductById(int id)
         {
-            Product? product = await _productRepository.GetProductById(id);
+            try
+            {
+                Product? product = await _productRepository.GetProductById(id);
 
-            ReadProductDto productDto = _mapper.Map<ReadProductDto>(product);
+                ReadProductDto productDto = _mapper.Map<ReadProductDto>(product);
 
-            if (productDto == null)
-                return NotFound();
-            return Ok(productDto);
+                if (productDto == null)
+                    return NotFound();
+                return Ok(productDto);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, _exceptionService.HandleException(ex));
+            }
         }
 
         /// <summary>
