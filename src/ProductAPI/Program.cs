@@ -9,6 +9,7 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<ProductContext>(opt =>
     opt.UseSqlServer(builder.Configuration.GetConnectionString("ProductConnection")));
 builder.Services.AddTransient<ExceptionHandlingService>();
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
