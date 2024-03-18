@@ -23,6 +23,22 @@ namespace ProductAPI.Controllers
             _exceptionService = exceptionService;
         }
 
+        /// <summary>
+        /// Adiciona um novo produto.
+        /// </summary>
+        /// <remarks>
+        /// Exemplo de corpo de solicitação JSON:
+        ///
+        ///     POST /api/Product
+        ///     {
+        ///         "name": "Nome do produto",
+        ///         "stock": "Estoque do produto",
+        ///         "price": "Preço do produto"
+        ///     }
+        ///
+        /// </remarks>
+        /// <param name="productDto">Informações necessários para criação de um novo produto.</param>
+        /// <returns>Produto adicionado.</returns>
         [HttpPost]
         public async Task<ActionResult<CreateProductDto>> AddProduct(CreateProductDto productDto)
         {
@@ -45,6 +61,12 @@ namespace ProductAPI.Controllers
             }
         }
 
+        /// <summary>
+        /// Obtém uma lista de produtos com opção de ordenação.
+        /// </summary>
+        /// <param name="orderBy">Coluna para ordenar a lista solicitada [id, name, price].</param>
+        /// <param name="ascending">Tipo de ordenação Ascendente(ascending = true) ou Descendente(ascending = false).</param>
+        /// <returns>Lista de produtos.</returns>
         [HttpGet]
         public async Task<ActionResult<List<ReadProductDto>>> GetProducts([FromQuery] string orderBy = "id",
             [FromQuery] bool ascending = true)
@@ -62,6 +84,11 @@ namespace ProductAPI.Controllers
             }
         }
 
+        /// <summary>
+        /// Obtém um produto pelo seu ID.
+        /// </summary>
+        /// <param name="id">ID do produto.</param>
+        /// <returns>O produto correspondente ao ID fornecido.</returns>
         [HttpGet("{id}")]
         public async Task<ActionResult<ReadProductDto>> GetProductById(int id)
         {
@@ -74,6 +101,11 @@ namespace ProductAPI.Controllers
             return Ok(productDto);
         }
 
+        /// <summary>
+        /// Obtém uma lista de produtos pelo seu nome.
+        /// </summary>
+        /// <param name="name">Nome do produto.</param>
+        /// <returns>O produto correspondente ao nome fornecido.</returns>
         [HttpGet("search/{name}")]
         public async Task<ActionResult<List<ReadProductDto>>> GetProductByName(string name)
         {
@@ -93,6 +125,23 @@ namespace ProductAPI.Controllers
             }
         }
 
+        /// <summary>
+        /// Atualiza um determinado produto por ID.
+        /// </summary>
+        /// <remarks>
+        /// Exemplo de corpo de solicitação JSON:
+        ///
+        ///     PUT /api/Product
+        ///     {
+        ///         "name": "Nome do produto",
+        ///         "stock": "Estoque do produto",
+        ///         "price": "Preço do produto"
+        ///     }
+        ///
+        /// </remarks>
+        /// <param name="id">ID do produto.</param>
+        /// <param name="productDto">Informações necessários para atualização de um produto.</param>
+        /// <returns>204 Produto atualizado com sucesso</returns>
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateProduct(int id, CreateProductDto productDto)
         {
@@ -120,6 +169,11 @@ namespace ProductAPI.Controllers
             }
         }
 
+        /// <summary>
+        /// Ecluír um determinado produto por ID.
+        /// </summary>
+        /// <param name="id">ID do produto.</param>
+        /// <returns>204 Produto excluído com sucesso</returns>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
