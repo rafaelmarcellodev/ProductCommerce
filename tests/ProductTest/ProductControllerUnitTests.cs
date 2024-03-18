@@ -289,5 +289,51 @@ namespace ProductTest
             var objectResult = Assert.IsType<ObjectResult>(result);
             Assert.Equal(500, objectResult.StatusCode);
         }
+
+        [Fact]
+        public async Task DeleteProduct_Returns_NoContent()
+        {
+            var controller = new ProductController(_mockProductRepository.Object, _mockMapper.Object, _mockExceptionHandlingService.Object);
+
+            var productId = 1;
+
+            _mockProductRepository.Setup(repo => repo.DeleteProduct(productId)).ReturnsAsync(true);
+
+            var result = await controller.DeleteProduct(productId);
+
+            var noContentResult = Assert.IsType<NoContentResult>(result);
+            Assert.Equal(204, noContentResult.StatusCode);
+        }
+
+        [Fact]
+        public async Task DeleteProduct_Returns_NotFound()
+        {
+            var controller = new ProductController(_mockProductRepository.Object, _mockMapper.Object, _mockExceptionHandlingService.Object);
+
+            var productId = 1;
+
+            _mockProductRepository.Setup(repo => repo.DeleteProduct(productId)).ReturnsAsync(false);
+
+            var result = await controller.DeleteProduct(productId);
+
+            var notFoundResult = Assert.IsType<NotFoundResult>(result);
+            Assert.Equal(404, notFoundResult.StatusCode);
+        }
+
+        [Fact]
+        public async Task DeleteProduct_Returns_StatusCode500()
+        {
+            var controller = new ProductController(_mockProductRepository.Object, _mockMapper.Object, _mockExceptionHandlingService.Object);
+
+            var productId = 1;
+
+            _mockProductRepository.Setup(repo => repo.DeleteProduct(productId)).ThrowsAsync(new Exception("Test exception"));
+            _mockExceptionHandlingService.Setup(s => s.HandleException(It.IsAny<Exception>())).Returns("Handled exception message");
+
+            var result = await controller.DeleteProduct(productId);
+
+            var objectResult = Assert.IsType<ObjectResult>(result);
+            Assert.Equal(500, objectResult.StatusCode);
+        }
     }
 }
