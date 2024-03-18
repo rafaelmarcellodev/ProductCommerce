@@ -87,5 +87,19 @@ namespace ProductTest
             Assert.NotNull(products);
             Assert.NotEmpty(products);
         }
+
+        [Fact]
+        public async Task UpdateProduct_Returns_NoContent()
+        {
+            var client = _factory.CreateClient();
+            var validProductId = 2;
+            var productDto = new CreateProductDto { Name = "Product Update", Price = 10.99m };
+            var content = new StringContent(JsonConvert.SerializeObject(productDto), Encoding.UTF8, "application/json");
+
+            var response = await client.PutAsync($"/api/product/{validProductId}", content);
+
+            response.EnsureSuccessStatusCode();
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        }
     }
 }
