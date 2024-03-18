@@ -69,5 +69,23 @@ namespace ProductTest
             Assert.NotNull(product);
             Assert.Equal(validProductId, product.Id);
         }
+
+        [Fact]
+        public async Task GetProductByName_Returns_Ok()
+        {
+            var client = _factory.CreateClient();
+            var validProductName = "Product 1";
+
+            var response = await client.GetAsync($"/api/product/search/{validProductName}");
+
+            response.EnsureSuccessStatusCode();
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var products = JsonConvert.DeserializeObject<List<ReadProductDto>>(responseContent);
+
+            Assert.NotNull(products);
+            Assert.NotEmpty(products);
+        }
     }
 }
