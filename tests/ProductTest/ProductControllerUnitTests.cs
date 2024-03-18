@@ -220,5 +220,74 @@ namespace ProductTest
             var objectResult = Assert.IsType<ObjectResult>(result.Result);
             Assert.Equal(500, objectResult.StatusCode);
         }
+
+        [Fact]
+        public async Task UpdateProduct_Returns_NoContent()
+        {
+            var controller = new ProductController(_mockProductRepository.Object, _mockMapper.Object, _mockExceptionHandlingService.Object);
+
+            var productId = 1;
+            var productDto = new CreateProductDto { Name = "Product Updated" };
+            var product = new Product { Id = productId, Name = "Product" };
+
+            _mockProductRepository.Setup(repo => repo.GetProductById(productId)).ReturnsAsync(product);
+            _mockMapper.Setup(m => m.Map(productDto, product)).Returns(product);
+
+            var result = await controller.UpdateProduct(productId, productDto);
+
+            var noContentResult = Assert.IsType<NoContentResult>(result);
+            Assert.Equal(204, noContentResult.StatusCode);
+        }
+
+        [Fact]
+        public async Task UpdateProduct_Returns_NotFound()
+        {
+            var controller = new ProductController(_mockProductRepository.Object, _mockMapper.Object, _mockExceptionHandlingService.Object);
+
+            var productId = 1;
+            var productDto = new CreateProductDto { Name = "Product Updated" };
+
+            _mockProductRepository.Setup(repo => repo.GetProductById(productId));
+
+            var result = await controller.UpdateProduct(productId, productDto);
+
+            var notFoundResult = Assert.IsType<NotFoundResult>(result);
+            Assert.Equal(404, notFoundResult.StatusCode);
+        }
+
+        [Fact]
+        public async Task UpdateProduct_Returns_BadRequest()
+        {
+            var controller = new ProductController(_mockProductRepository.Object, _mockMapper.Object, _mockExceptionHandlingService.Object);
+
+            var productId = 1;
+            var productDto = new CreateProductDto { Name = "Product Updated", Price = -10.99m };
+            var product = new Product { Id = productId, Name = "Product", Price = -10.99m };
+
+            _mockProductRepository.Setup(repo => repo.GetProductById(productId)).ReturnsAsync(product);
+            _mockMapper.Setup(m => m.Map(productDto, product)).Returns(product);
+
+            var result = await controller.UpdateProduct(productId, productDto);
+
+            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+            Assert.IsType<SerializableError>(badRequestResult.Value);
+        }
+
+        [Fact]
+        public async Task UpdateProduct_Returns_StatusCode500()
+        {
+            var controller = new ProductController(_mockProductRepository.Object, _mockMapper.Object, _mockExceptionHandlingService.Object);
+
+            var productId = 1;
+            var productDto = new CreateProductDto { Name = "Product Updated", Price = 10.99m };
+
+            _mockProductRepository.Setup(repo => repo.GetProductById(productId)).ThrowsAsync(new Exception("Test exception"));
+            _mockExceptionHandlingService.Setup(s => s.HandleException(It.IsAny<Exception>())).Returns("Handled exception message");
+
+            var result = await controller.UpdateProduct(productId, productDto);
+
+            var objectResult = Assert.IsType<ObjectResult>(result);
+            Assert.Equal(500, objectResult.StatusCode);
+        }
     }
 }
