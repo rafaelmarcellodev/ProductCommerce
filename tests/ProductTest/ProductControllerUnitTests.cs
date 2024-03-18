@@ -111,5 +111,56 @@ namespace ProductTest
             var objectResult = Assert.IsType<ObjectResult>(result.Result);
             Assert.Equal(500, objectResult.StatusCode);
         }
+
+
+        [Fact]
+        public async Task GetProductById_Returns_Ok()
+        {
+            var controller = new ProductController(_mockProductRepository.Object, _mockMapper.Object, _mockExceptionHandlingService.Object);
+
+            var productId = 1;
+            var product = new Product { Id = productId, Name = "Product 1" };
+            var expectedDto = new ReadProductDto { Id = productId, Name = "Product 1" };
+
+            _mockProductRepository.Setup(repo => repo.GetProductById(productId)).ReturnsAsync(product);
+            _mockMapper.Setup(m => m.Map<ReadProductDto>(product)).Returns(expectedDto);
+
+            var result = await controller.GetProductById(productId);
+
+            var okResult = Assert.IsType<OkObjectResult>(result.Result);
+            var actualDto = Assert.IsAssignableFrom<ReadProductDto>(okResult.Value);
+            Assert.Equal(expectedDto.Id, actualDto.Id);
+            Assert.Equal(expectedDto.Name, actualDto.Name);
+        }
+
+        [Fact]
+        public async Task GetProductById_Returns_NotFound()
+        {
+            var controller = new ProductController(_mockProductRepository.Object, _mockMapper.Object, _mockExceptionHandlingService.Object);
+
+            var productId = 1;
+
+            _mockProductRepository.Setup(repo => repo.GetProductById(productId)).ReturnsAsync((new Product()));
+
+            var result = await controller.GetProductById(productId);
+
+            Assert.IsType<NotFoundResult>(result.Result);
+        }
+
+        [Fact]
+        public async Task GetProductById_Returns_StatusCode500()
+        {
+            var controller = new ProductController(_mockProductRepository.Object, _mockMapper.Object, _mockExceptionHandlingService.Object);
+
+            var productId = 1;
+
+            _mockProductRepository.Setup(repo => repo.GetProductById(productId)).ThrowsAsync(new Exception("Test exception"));
+            _mockExceptionHandlingService.Setup(s => s.HandleException(It.IsAny<Exception>())).Returns("Handled exception message");
+
+            var result = await controller.GetProductById(productId);
+
+            var objectResult = Assert.IsType<ObjectResult>(result.Result);
+            Assert.Equal(500, objectResult.StatusCode);
+        }
     }
 }
