@@ -101,5 +101,17 @@ namespace ProductTest
             response.EnsureSuccessStatusCode();
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         }
+
+        [Fact]
+        public async Task DeleteProduct_Returns_NoContent()
+        {
+            var client = _factory.CreateClient();
+            var productId = 3;
+
+            var response = await client.DeleteAsync($"/api/product/{productId}");
+
+            response.EnsureSuccessStatusCode();
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        }
     }
 }
