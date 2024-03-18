@@ -51,5 +51,23 @@ namespace ProductTest
             var sortedProducts = products.OrderBy(p => p.Price).ToList();
             Assert.Equal(sortedProducts, products);
         }
+
+        [Fact]
+        public async Task GetProductById_Returns_Ok()
+        {
+            var client = _factory.CreateClient();
+            var validProductId = 1;
+
+            var response = await client.GetAsync($"/api/product/{validProductId}");
+
+            response.EnsureSuccessStatusCode();
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var product = JsonConvert.DeserializeObject<ReadProductDto>(responseContent);
+
+            Assert.NotNull(product);
+            Assert.Equal(validProductId, product.Id);
+        }
     }
 }
